@@ -1,23 +1,9 @@
-"""
-Assignment 3: UGV Navigation with Dynamic Obstacles
-Dynamic obstacles are NOT known a-priori and can appear/disappear at runtime.
-Uses D* Lite algorithm — an efficient replanning algorithm designed for
-dynamic environments. The UGV senses obstacles within a sensor radius and
-replans only when the environment changes.
-
-D* Lite is the industry-standard algorithm for UGV/robot navigation with
-dynamic obstacles (used in NASA rovers, military UGVs, autonomous vehicles).
-"""
-
 import heapq
 import random
 import time
 import math
 from collections import defaultdict
 from enum import Enum
-
-
-# ─── Grid ─────────────────────────────────────────────────────────────────────
 
 class Cell:
     EMPTY    = 0
@@ -29,10 +15,7 @@ class Cell:
 
 
 class DynamicGrid:
-    """
-    70×70 grid where obstacles can appear and disappear dynamically.
-    The UGV only knows obstacles it has sensed (within sensor_radius).
-    """
+   
     def __init__(self, rows=70, cols=70, sensor_radius=5, seed=None):
         self.rows          = rows
         self.cols          = cols
@@ -56,12 +39,6 @@ class DynamicGrid:
                     self.true_grid[r][c] = Cell.OBSTACLE
     
     def update_dynamic_obstacles(self):
-        """
-        Simulate dynamic obstacle changes in the true world:
-        - Some free cells randomly become blocked
-        - Some existing obstacles disappear
-        Returns set of changed cells.
-        """
         changed = set()
         for r in range(self.rows):
             for c in range(self.cols):
@@ -76,10 +53,6 @@ class DynamicGrid:
         return changed
     
     def sense(self, ugv_r, ugv_c):
-        """
-        UGV senses cells within sensor_radius.
-        Updates known_grid and returns list of newly discovered changes.
-        """
         newly_discovered = []
         for dr in range(-self.sensor_radius, self.sensor_radius + 1):
             for dc in range(-self.sensor_radius, self.sensor_radius + 1):
@@ -114,19 +87,7 @@ class DynamicGrid:
                 result.append((nr, nc, cost))
         return result
 
-
-# ─── D* Lite ──────────────────────────────────────────────────────────────────
-
 class DStarLite:
-    """
-    D* Lite: Incremental replanning algorithm for dynamic environments.
-    Reference: Koenig & Likhachev (2002)
-    
-    D* Lite plans backwards (from goal to start).
-    When obstacles change, only affected regions are replanned — 
-    making it far more efficient than replanning with A* from scratch.
-    """
-    
     INF = float('inf')
     
     def __init__(self, grid: DynamicGrid, start, goal):
@@ -234,10 +195,6 @@ class DStarLite:
         return iterations
     
     def notify_obstacle_change(self, changed_cells):
-        """
-        Call after obstacles are added/removed.
-        Efficiently updates only affected vertices.
-        """
         self.km += self._heuristic(self.s_last)
         self.s_last = self.start
         
@@ -248,16 +205,11 @@ class DStarLite:
                 self._update_vertex(nbr)
     
     def update_start(self, new_start):
-        """Move start one step forward."""
         self.km += self._heuristic(self.s_last)
         self.s_last = self.start
         self.start  = new_start
     
     def get_next_step(self):
-        """
-        Get the best next cell to move to from current start.
-        Returns None if no path exists.
-        """
         if self.rhs[self.start] == self.INF:
             return None
         
@@ -275,7 +227,6 @@ class DStarLite:
         return best_node
     
     def extract_path(self):
-        """Extract the currently planned path from start to goal."""
         path = [self.start]
         visited = {self.start}
         cur = self.start
@@ -310,9 +261,7 @@ class DStarLite:
 def simulate_ugv_dynamic(start=(2, 2), goal=(67, 67),
                           max_steps=5000, seed=42,
                           sensor_radius=5, dynamic=True):
-    """
-    Simulate UGV moving through a dynamic obstacle environment.
-    """
+    
     print("\n" + "🤖 " * 20)
     print("  UGV NAVIGATION — Dynamic Obstacles Environment")
     print("  Algorithm: D* Lite (Incremental Replanning)")

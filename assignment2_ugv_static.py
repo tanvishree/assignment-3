@@ -1,10 +1,3 @@
-"""
-Assignment 2: UGV Navigation with Static Obstacles (70x70 km Grid)
-Uses Dijkstra's / A* algorithm to find optimal path on a battlefield grid.
-Obstacles are known a-priori with three density levels: LOW, MEDIUM, HIGH.
-Measures of Effectiveness (MOE) are reported.
-"""
-
 import heapq
 import random
 import time
@@ -72,8 +65,6 @@ class Grid:
                    for r in range(self.rows) for c in range(self.cols))
 
 
-# ─── A* Search ────────────────────────────────────────────────────────────────
-
 def heuristic(r1, c1, r2, c2):
     """Octile distance heuristic for 8-directional movement."""
     dx = abs(r1 - r2)
@@ -103,7 +94,7 @@ def astar(grid, start, goal):
         nodes_explored += 1
         
         if (r, c) == (gr, gc):
-            # Reconstruct path
+           
             path = []
             cur = (gr, gc)
             while cur is not None:
@@ -113,7 +104,6 @@ def astar(grid, start, goal):
             runtime_ms = (time.perf_counter() - t0) * 1000
             return path, g, nodes_explored, runtime_ms
         
-        # Skip stale entries
         if g > g_cost.get((r, c), float('inf')):
             continue
         
@@ -128,8 +118,6 @@ def astar(grid, start, goal):
     runtime_ms = (time.perf_counter() - t0) * 1000
     return None, float('inf'), nodes_explored, runtime_ms   # No path
 
-
-# ─── Visualization ────────────────────────────────────────────────────────────
 
 def visualize_grid(grid, path, start, goal, explored_cells=None, max_display=40):
     """ASCII visualization (truncated to max_display x max_display for readability)."""
@@ -176,8 +164,6 @@ def visualize_grid(grid, path, start, goal, explored_cells=None, max_display=40)
     print("  Legend: S=Start  G=Goal  ●=Path  ○=Explored  █=Obstacle  ·=Free\n")
 
 
-# ─── MOE Report ───────────────────────────────────────────────────────────────
-
 def print_moe_report(grid, path, cost, nodes_explored, runtime_ms, start, goal, density):
     """Print Measures of Effectiveness (MOE)."""
     total_cells = grid.rows * grid.cols
@@ -195,7 +181,6 @@ def print_moe_report(grid, path, cost, nodes_explored, runtime_ms, start, goal, 
     print(f"  Start              : {start}")
     print(f"  Goal               : {goal}")
     
-    # Straight-line (Euclidean) distance in km (1 cell = 1 km)
     sl_dist = math.hypot(goal[0]-start[0], goal[1]-start[1])
     print(f"\n  --- Path Quality ---")
     
@@ -217,9 +202,6 @@ def print_moe_report(grid, path, cost, nodes_explored, runtime_ms, start, goal, 
     print(f"  Search Efficiency  : {nodes_explored/free_cells*100:.1f}% of free cells")
     print(f"  Runtime            : {runtime_ms:.3f} ms")
     print("="*60 + "\n")
-
-
-# ─── Main ─────────────────────────────────────────────────────────────────────
 
 def run_ugv_simulation(density=Density.MEDIUM, seed=42,
                         start=(2, 2), goal=(67, 67)):

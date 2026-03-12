@@ -1,15 +1,7 @@
-"""
-Assignment 1: Dijkstra's Algorithm for Indian Cities Road Network
-Implements uniform-cost search (Dijkstra's algorithm) to find shortest paths
-between major Indian cities using approximate road distances (in km).
-"""
-
 import heapq
 from collections import defaultdict
 
-
 # Road distances (in km) between major Indian cities
-# Data sourced from approximate real road distances
 INDIAN_CITIES_GRAPH = {
     "Delhi": {
         "Jaipur": 281, "Agra": 206, "Chandigarh": 243, "Lucknow": 555,
@@ -222,8 +214,6 @@ INDIAN_CITIES_GRAPH = {
         "Agra": 56, "Delhi": 150
     }
 }
-
-
 def dijkstra(graph, start, goal=None):
     """
     Dijkstra's Algorithm (Uniform-Cost Search)
@@ -237,17 +227,13 @@ def dijkstra(graph, start, goal=None):
         distances: dict of shortest distances from start to all cities
         predecessors: dict to reconstruct paths
     """
-    # Priority queue: (cost, city)
     priority_queue = [(0, start)]
     
-    # Best known distances
     distances = {city: float('inf') for city in graph}
     distances[start] = 0
     
-    # To reconstruct path
     predecessors = {city: None for city in graph}
     
-    # Visited set
     visited = set()
     
     nodes_explored = 0
@@ -261,11 +247,9 @@ def dijkstra(graph, start, goal=None):
         visited.add(current_city)
         nodes_explored += 1
         
-        # Early exit if goal found
         if goal and current_city == goal:
             break
         
-        # Explore neighbors
         for neighbor, weight in graph.get(current_city, {}).items():
             if neighbor not in visited:
                 new_cost = current_cost + weight
@@ -287,7 +271,7 @@ def reconstruct_path(predecessors, start, goal):
     path.reverse()
     if path[0] == start:
         return path
-    return []  # No path found
+    return [] 
 
 
 def find_shortest_path(graph, start, goal):
@@ -407,25 +391,5 @@ def interactive_menu(graph):
             print("  ⚠️  Invalid choice. Please enter 1–4.")
 
 
-# ─── Demo runs ────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    # Demo: a few example paths
-    demos = [
-        ("Delhi",    "Chennai"),
-        ("Mumbai",   "Kolkata"),
-        ("Amritsar", "Kochi"),
-        ("Jaipur",   "Guwahati"),
-    ]
-    
-    print("\n" + "="*60)
-    print("  DEMO: Dijkstra's Algorithm on India Road Network")
-    print("="*60)
-    
-    for src, dst in demos:
-        find_shortest_path(INDIAN_CITIES_GRAPH, src, dst)
-    
-    # All paths from Delhi
-    find_all_shortest_paths(INDIAN_CITIES_GRAPH, "Delhi")
-    
-    # Interactive mode
     interactive_menu(INDIAN_CITIES_GRAPH)
